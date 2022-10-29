@@ -1,0 +1,39 @@
+html {
+  font-size: 10px;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  overscroll-behavior: none;
+  margin: 0;
+  font-family: $body-text;
+  font-size: 1.6rem;
+  overflow-x: hidden;
+  background-color: map-get($colors, background-grey);
+  height: 100vh;
+}
+
+button {
+  font-family: $title-text;
+}
+
+button,
+input,
+select {
+  outline: none;
+}
+main {
+  margin-top: 4.8rem;
+}
+
+@media screen and (min-width: 992px) {
+  body {
+    font-size: 1.8rem;
+  }
+}
