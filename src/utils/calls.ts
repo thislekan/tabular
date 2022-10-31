@@ -1,4 +1,4 @@
-import { IFetchInputs, IFetchResults } from "./interfaces";
+import { IFetchInputs } from "./interfaces";
 
 export const makeRequest = async ({ url, options }: IFetchInputs) => {
   try {
