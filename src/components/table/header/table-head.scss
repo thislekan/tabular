@@ -1,0 +1,31 @@
+table {
+  thead {
+    tr {
+      td {
+        background-color: map-get($colors, brand-black);
+        color: map-get($colors, brand-white);
+        height: 6rem;
+      }
+
+      .name-cell {
+        display: flex;
+        align-items: center;
+
+        .arrows {
+          margin-left: 1rem;
+          display: flex;
+          justify-content: space-evenly;
+          cursor: pointer;
+
+          .arrow {
+            font-size: 2rem;
+
+            &--down {
+              margin-left: 1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

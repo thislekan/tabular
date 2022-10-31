@@ -1,0 +1,9 @@
+table {
+  tbody {
+    tr {
+      td {
+        background-color: map-get($colors, brand-white);
+      }
+    }
+  }
+}
