@@ -1,6 +1,5 @@
 import { BaseSyntheticEvent, useContext } from "react";
 import { TableContext } from "../../context";
-import debounceFn from "../../../utils/debounce";
 
 const TableFooter = () => {
   const { limit, page, setPagination, entries, searchResults } =
@@ -19,8 +18,7 @@ const TableFooter = () => {
 
   const paginateFunc = (move: string) => () => {
     const value = move === "prev" ? page - 1 : page + 1;
-    const setLimit = () => setPagination({ limit, page: Number(value) });
-    debounceFn(setLimit, 200);
+    setPagination({ limit, page: Number(value) });
   };
   return (
     <tfoot>
