@@ -5,7 +5,7 @@
   justify-content: flex-end;
   position: absolute;
   width: calc(100% - 3.2rem);
-  left: 1.6rem;
+  right: 1.6rem;
 
   &__limit,
   &__page {
@@ -62,5 +62,17 @@
     height: 2rem;
     font-size: 1.4rem;
     text-align: center;
+  }
+
+  @media screen and (min-width: 600px) {
+    right: 5rem;
+  }
+
+  @media screen and (min-width: 800px) {
+    right: calc(50% - 30rem);
+  }
+
+  @media screen and (min-width: 1200px) {
+    right: calc(50% - 45rem);
   }
 }

@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { BaseSyntheticEvent, useEffect, useState, useCallback } from "react";
 import { IEntry } from "../table/interface";
 import { makeRequest } from "../../utils/calls";
 import { IFetchResults } from "../../utils/interfaces";
@@ -8,74 +8,80 @@ interface IViewEntry {
   closePortal: () => void;
 }
 
-const listOfUndos: { entry: IEntry | null; task: string }[] = [];
-const listOfRedos: any[] = [];
 const baseUrl = "https://62a6bb9697b6156bff7e6251.mockapi.io/v1/";
 const ViewEntry = (props: IViewEntry): JSX.Element => {
   const { name, updatedAt, createdAt, description, type, id } =
     props.entry || {};
   const [data, setData] = useState<IEntry | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [descriptionValue, setDescriptionValue] = useState("");
+  const [descriptionValue, setDescriptionValue] = useState(description);
   const [editCompleted, setEditCompleted] = useState(false);
   const [undoCompleted, setUndoCompleted] = useState(false);
 
-  useEffect(() => {
-    const fetchCurrentData = async () => {
-      try {
-        const result: IFetchResults = await makeRequest({
-          url: `${baseUrl}apis/${id}`,
-        });
-        if (result.name) setData(result);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const fetchCurrentData = useCallback(async () => {
+    try {
+      const result: IFetchResults = await makeRequest({
+        url: `${baseUrl}apis/${id}`,
+      });
+      if (result.name) setData(result);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [id]);
 
+  useEffect(() => {
     fetchCurrentData();
-    console.log({ editCompleted });
-  }, [editCompleted, id]);
-  const handleClick = () => {
-    props.closePortal();
-    setEditCompleted(false);
-  };
+  }, [fetchCurrentData]);
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.clear();
+    };
+  }, []);
+
+  const handleClick = () => props.closePortal();
   const toggleEditMode = () => setEditMode(!editMode);
-  const handleInput = (e: { target: { value: SetStateAction<string> } }) => {
+  const handleInput = (e: BaseSyntheticEvent) => {
     setDescriptionValue(e.target.value);
   };
-  const formatUndos = (task: string) => {
-    const undoTask = { entry: props.entry, task, type: "UNDO" };
-    listOfUndos.push(undoTask);
-    sessionStorage.setItem("undos", JSON.stringify(listOfUndos));
-  };
 
-  const submitEdit =
-    (overrideId?: string, overrideDescription?: string) => async () => {
-      if (!descriptionValue.length)
-        return alert("Description cannot be empty!");
-      try {
-        const newValue = await makeRequest({
-          url: `${baseUrl}apis/${overrideId || id}`,
-          options: {
-            method: "PUT",
-            body: JSON.stringify({
-              description: overrideDescription || descriptionValue,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
+  const submitEdit = (entry?: IEntry) => async () => {
+    const { id: overrideId, description: overrideDescription } = entry || {};
+    if (!descriptionValue?.length) {
+      return alert("Description cannot be empty!");
+    }
+    setEditMode(!editMode);
+    try {
+      const newValue = await makeRequest({
+        url: `${baseUrl}apis/${overrideId || id}`,
+        options: {
+          method: "PUT",
+          body: JSON.stringify({
+            description: overrideDescription || descriptionValue,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
-        });
+        },
+      });
 
-        if (newValue) {
-          formatUndos("EDIT");
-          setEditCompleted(!editCompleted);
-        }
-      } catch (error) {
-        console.error(error);
+      if (newValue) {
+        const undoList = JSON.parse(sessionStorage.getItem("undos")!) || [];
+        undoList.push({
+          entry: entry || props.entry,
+          task: "EDIT",
+          type: "UNDO",
+        });
+        sessionStorage.setItem("undos", JSON.stringify(undoList));
+        // setDescriptionValue(newValue.description);
+        setEditCompleted(!editCompleted);
+        setData(newValue);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const deleteEntry = async () => {
     try {
@@ -98,13 +104,18 @@ const ViewEntry = (props: IViewEntry): JSX.Element => {
 
   const undoFunc = async () => {
     try {
-      const list = JSON.parse(sessionStorage.getItem("undos")!);
+      const redos = JSON.parse(sessionStorage.getItem("redos")!) || [];
+      const list = JSON.parse(sessionStorage.getItem("undos")!) || [];
       const item = list.pop();
-      listOfRedos.push(item);
-      await submitEdit(item.entry.id, item.entry.description)();
+      redos.push({
+        entry: data,
+        task: "EDIT",
+        type: "REDO",
+      });
+      await submitEdit(item)();
       setDescriptionValue(item.entry.description);
       sessionStorage.setItem("undos", JSON.stringify(list));
-      sessionStorage.setItem("redos", JSON.stringify(listOfRedos)!);
+      sessionStorage.setItem("redos", JSON.stringify(redos)!);
       setUndoCompleted(true);
       setEditMode(false);
     } catch (error) {
@@ -114,14 +125,16 @@ const ViewEntry = (props: IViewEntry): JSX.Element => {
   };
 
   const redoFunc = async () => {
+    // debugger;
     try {
+      const undos = JSON.parse(sessionStorage.getItem("undos")!) || [];
       const list = JSON.parse(sessionStorage.getItem("redos")!);
       const item = list.pop();
-      listOfUndos.push(item);
-      await submitEdit(item.entry.id, item.entry.description)();
+      undos.push(item);
+      await submitEdit(item)();
       setDescriptionValue(item.entry.description);
       sessionStorage.setItem("redos", JSON.stringify(list));
-      sessionStorage.setItem("undos", JSON.stringify(listOfUndos));
+      sessionStorage.setItem("undos", JSON.stringify(undos));
       setUndoCompleted(false);
       setEditMode(false);
     } catch (error) {
@@ -140,8 +153,7 @@ const ViewEntry = (props: IViewEntry): JSX.Element => {
           <p>name: {!data ? name : data.name}</p>
           {!editMode ? (
             <p onClick={toggleEditMode} className="editable">
-              description:{" "}
-              {!data ? description : descriptionValue || data.description}
+              description: {descriptionValue}
             </p>
           ) : (
             <p>
@@ -159,18 +171,15 @@ const ViewEntry = (props: IViewEntry): JSX.Element => {
           <p>updatedAt: {!data ? updatedAt : data.updatedAt}</p>
         </div>
         <div className="entry__container__footer">
-          {!descriptionValue.length ? (
-            <>
-              <button className="btn" onClick={toggleEditMode}>
-                {!editMode ? "Edit" : "Cancel Edit"}
-              </button>
-              <button className="btn" onClick={deleteEntry}>
-                Delete
-              </button>
-            </>
-          ) : (
-            <button onClick={submitEdit()}>Submit</button>
+          <button className="btn" onClick={toggleEditMode}>
+            {!editMode ? "Edit" : "Cancel Edit"}
+          </button>
+          {!editMode && (
+            <button className="btn" onClick={deleteEntry}>
+              Delete
+            </button>
           )}
+          {editMode && <button onClick={submitEdit()}>Submit</button>}
           {editCompleted && <button onClick={undoFunc}>Undo</button>}
           {undoCompleted && <button onClick={redoFunc}>Redo</button>}
         </div>

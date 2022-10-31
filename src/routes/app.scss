@@ -4,7 +4,14 @@
 
   @media screen and (min-width: 600px) {
     padding: $tablet;
-    overflow-y: auto;
+    // overflow-y: auto;
+  }
+
+  @media screen and (min-width: 800px) {
+    padding: unset;
+    max-width: 600px;
+    margin: 0 calc(50% - 300px);
+    overflow: hidden;
   }
 
   @media screen and (min-width: 1200px) {

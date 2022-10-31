@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { TableContext } from "../../context";
 
 const Tablehead = () => {
   const { sortEntries } = useContext(TableContext)!;
   const [clickCount, setClickCount] = useState(0);
   const toggleSort = () => {
-    console.log({ clickCount });
     switch (clickCount) {
       case 0:
         setClickCount(1);
@@ -21,9 +20,6 @@ const Tablehead = () => {
         break;
     }
   };
-  useEffect(() => {
-    console.log(clickCount, "--after");
-  }, [clickCount]);
 
   return (
     <thead>
@@ -31,18 +27,16 @@ const Tablehead = () => {
         <td>S/No.</td>
         <td className="name-cell">
           Name{" "}
-          <div className="arrows">
-            {clickCount !== 1 && (
-              <span className="arrow arrow--up" onClick={toggleSort}>
-                &#10506;
-              </span>
-            )}
-            {clickCount !== 2 && (
-              <span className="arrow arrow--down" onClick={toggleSort}>
-                &#10507;
-              </span>
-            )}
-          </div>
+          {clickCount !== 1 && (
+            <span className="arrow arrow--up" onClick={toggleSort}>
+              &#10506;
+            </span>
+          )}
+          {clickCount !== 2 && (
+            <span className="arrow arrow--down" onClick={toggleSort}>
+              &#10507;
+            </span>
+          )}
         </td>
         <td>Description</td>
         <td>Type</td>
