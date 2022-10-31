@@ -24,6 +24,7 @@
 - tests (none written)
 - cleanup (some components, DRY & KISS principles could be implemented)
 - page limit (not smooth enough experience)
+- implement debounce for some input fields
 
 ---
 
