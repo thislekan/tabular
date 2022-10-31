@@ -1,0 +1,20 @@
+table {
+  thead,
+  tbody,
+  tfoot {
+    tr {
+      td {
+        padding: 1rem;
+        max-width: 25rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-top: 1px solid #ecedef;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+@import "./header/table-head.scss";
+@import "./body/table-body.scss";
+@import "./footer/tabel-footer.scss";

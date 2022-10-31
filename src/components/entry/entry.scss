@@ -1,0 +1,52 @@
+.entry {
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+
+  &__container {
+    background: white;
+    position: absolute;
+    height: 35rem;
+    width: 30rem;
+    top: calc(50% - 175px);
+    left: calc(50% - 150px);
+    border-radius: 0.6rem;
+
+    &__content {
+      padding: 2rem;
+      p {
+        height: 4rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .editable {
+        cursor: pointer;
+      }
+    }
+
+    &__encloser {
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      cursor: pointer;
+      border-radius: 100%;
+      border: 1px solid #ce2029;
+      background-color: #ce2029;
+      height: 2.5rem;
+      width: 2.5rem;
+      font-size: 1.5rem;
+      font-weight: $heavy;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: map-get($colors, brand-white);
+    }
+  }
+}

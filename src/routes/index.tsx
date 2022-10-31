@@ -4,9 +4,11 @@ import HomePage from "../components";
 const AppRouter = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-      </Routes>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 };

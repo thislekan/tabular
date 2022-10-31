@@ -1,0 +1,12 @@
+.home {
+  height: 100%;
+
+  &__table {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+
+@import "./table/table.scss";
+@import "./entry/entry.scss";
+@import "./search/search.scss";
